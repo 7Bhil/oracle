@@ -92,15 +92,37 @@ class OracleCorrelator:
         return reports
 
     def run_brain_cycle(self):
-        print(f"[*] {datetime.now().strftime('%H:%M:%S')} [ORACLE] Analyse de corrélation en cours...")
+        """Lance un cycle d'analyse et signale que le cerveau est actif"""
+        logger.info("Cycle de corrélation en cours...")
+        if self.db:
+            self.db.send_heartbeat("oracle")
+            
         reports = self.correlate()
         if reports:
             for r in reports:
-                print(f"[🧠 ORACLE] INCIDENT DÉTECTÉ : {r['attacker']} | Niveau: {r['threat_level']}")
-                print(f"    Chaîne d'attaque : {r['attack_chain']}")
+                logger.warning(f"INCIDENT DÉTECTÉ : {r['attacker']} | Niveau: {r['threat_level']}")
         else:
-            print("    [.] RAS : Aucun pattern d'attaque complexe détecté.")
+            logger.info("Aucun incident complexe détecté.")
+
+    def start_daemon(self, interval=30):
+        """Lance Oracle en mode continu"""
+        logger.info(f"Démon Oracle lancé (Intervalle: {interval}s)")
+        try:
+            while True:
+                self.run_brain_cycle()
+                time.sleep(interval)
+        except KeyboardInterrupt:
+            logger.info("Arrêt du cerveau Oracle.")
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Mirage Oracle - The Autonomous Brain")
+    parser.add_argument("--daemon", action="store_true", help="Run in continuous mode")
+    parser.add_argument("--interval", type=int, default=30, help="Check interval in seconds")
+    args = parser.parse_args()
+
     correlator = OracleCorrelator()
-    correlator.run_brain_cycle()
+    if args.daemon:
+        correlator.start_daemon(args.interval)
+    else:
+        correlator.run_brain_cycle()
