@@ -81,6 +81,14 @@ class OracleCorrelator:
                         "data": report
                     })
                     
+                    # --- DÉCISION AUTONOME (DÉFENSE ACTIVE) ---
+                    if threat_level == "CRITICAL":
+                        logger.warning(f"Menace CRITIQUE détectée pour {ip}. Déclenchement GHOST.")
+                        self.db.push_command("ghost", "trap_attacker", target_ip=ip)
+                    elif threat_level == "HIGH":
+                        logger.warning(f"Menace ÉLEVÉE détectée pour {ip}. Demande d'isolation SENTINELLE.")
+                        self.db.push_command("sentinelle", "isolate_ip", target_ip=ip)
+                    
         return reports
 
     def run_brain_cycle(self):
