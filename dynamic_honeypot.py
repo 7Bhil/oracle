@@ -21,7 +21,7 @@ class DynamicLure:
 
     def create_targeted_lure(self, attacker_ip, intent):
         """Ordonne à Ghost de créer un leurre spécifique"""
-        print(f"[🧠 ORACLE] Création d'un leurre dynamique pour {attacker_ip} (Intention: {intent})")
+        print(f"[ ORACLE] Création d'un leurre dynamique pour {attacker_ip} (Intention: {intent})")
         factory = GhostCloneFactory()
         
         if intent == "database":
